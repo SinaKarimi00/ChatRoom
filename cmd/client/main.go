@@ -17,13 +17,11 @@ func main() {
 
 	username := cli.ReadInput("Enter your username: ")
 
-	// Notify the server of the new user
 	err = natsClient.Publish("chatroom.join", []byte(username))
 	if err != nil {
 		log.Fatalf("Error publishing join message: %v", err)
 	}
 
-	// Subscribe to broadcasted messages
 	_, err = natsClient.Subscribe("chatroom.messages", func(msg *nats.Msg) {
 		cli.PrintOutput(string(msg.Data))
 	})
@@ -31,7 +29,6 @@ func main() {
 		log.Fatalf("Error subscribing to chat messages: %v", err)
 	}
 
-	// Subscribe to user-specific responses for #users
 	_, err = natsClient.Subscribe("chatroom.users.response."+username, func(msg *nats.Msg) {
 		cli.PrintOutput(string(msg.Data))
 	})
